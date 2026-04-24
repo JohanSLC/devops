@@ -1,33 +1,61 @@
-name: Laravel CI/CD
+name: Laravel CI
 
 on:
   push:
+    branches: [ "main", "feature/*" ]
+  pull_request:
     branches: [ "main" ]
 
 jobs:
-  build:
+  laravel-tests:
     runs-on: ubuntu-latest
 
+    services:
+      mysql:
+        image: mysql:8
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: SistemaInventarioColegio
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+
+    env:
+      DB_CONNECTION: mysql
+      DB_HOST: 127.0.0.1
+      DB_PORT: 3306
+      DB_DATABASE: SistemaInventarioColegiogit add .
+git commit -m "fix: corregir pipeline CI"
+      DB_USERNAME: root
+      DB_PASSWORD: root
+
     steps:
-    - name: Clonar repo
-      uses: actions/checkout@v3
+      - name: Checkout código
+        uses: actions/checkout@v4
 
-    - name: Instalar PHP
-      uses: shivammathur/setup-php@v2
-      with:
-        php-version: 8.2
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.2
 
-    - name: Instalar dependencias
-      run: composer install
+      - name: Instalar dependencias
+        run: composer install --no-progress --prefer-dist
 
-    - name: Copiar .env
-      run: cp .env.example .env
+      - name: Copiar .env
+        run: cp .env.example .env
 
-    - name: Generar key
-      run: php artisan key:generate
+      - name: Generar APP_KEY
+        run: php artisan key:generate
 
-    - name: Ejecutar tests
-      run: php artisan test
+      - name: Limpiar config
+        run: php artisan config:clear
 
-    - name: Build Docker
-      run: docker build -t inventario-app .
+      - name: Ejecutar migraciones
+        run: php artisan migrate --force
+
+      - name: Ejecutar tests
+        run: php artisan test
