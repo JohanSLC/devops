@@ -73,7 +73,7 @@
                 </div>
                 <div class="col-md-4 d-flex align-items-end">
                     <button type="submit" class="btn btn-primary me-2">
-                        <i class="bi bi-search me-1"></i> Buscar
+                        <i class="bi bi-search me-3"></i> Buscar
                     </button>
                     <a href="{{ route('categorias.index') }}" class="btn btn-outline-secondary">
                         <i class="bi bi-x-circle me-1"></i> Limpiar
