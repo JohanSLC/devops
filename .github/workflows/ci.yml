@@ -31,16 +31,3 @@ jobs:
 
     - name: Build Docker
       run: docker build -t inventario-app .
-
-    - name: Deploy por SSH
-      uses: appleboy/ssh-action@v0.1.6
-      with:
-      host: ${{ secrets.SERVER_IP }}
-      username: root
-      key: ${{ secrets.SSH_KEY }}
-      script: |
-        cd /var/www/inventario
-        git pull
-        docker-compose down
-        docker-compose up -d --build
-
